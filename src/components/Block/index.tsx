@@ -4,16 +4,21 @@ import React, { FC } from "react";
 
 type Props = {
   active?: boolean;
+  isOpacity?: boolean;
 };
 
-const Block: FC<Props> = ({ active = false }) => {
+const Block: FC<Props> = ({ active = false, isOpacity = false }) => {
   let blockColor = "border-[#879372] after:bg-[#879372]";
+  let opacity = "opacity-100";
   if (active) {
     blockColor = "border-[#000] after:bg-[#000]";
   }
+  if (isOpacity) {
+    opacity = "opacity-0";
+  }
   return (
     <i
-      className={`after:content mb-[0.2rem] ml-[0.2rem] block h-8 w-8 border-[0.2rem] after:ml-[0.2rem] after:mt-[0.2rem] after:block after:h-[1.2rem] after:w-[1.2rem]  after:content-[''] ${blockColor}`}
+      className={`after:content mb-[0.1rem] ml-[0.1rem] block h-[1rem] w-[1rem] border-[0.1rem] after:ml-[0.1rem] after:mt-[0.1rem] after:block after:h-[0.6rem] after:w-[0.6rem]  after:content-[''] ${blockColor} ${opacity}`}
     />
   );
 };
