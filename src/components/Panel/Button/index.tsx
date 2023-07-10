@@ -8,9 +8,9 @@ type Props = {
 };
 
 const buttonSize = {
-  sm: "2rem",
-  md: "4rem",
-  lg: "6rem",
+  sm: "3rem",
+  md: "6rem",
+  lg: "9rem",
 };
 
 const Button: FC<Props> = ({ label, size = "sm", bg = "blue", onClick }) => {
