@@ -37,7 +37,7 @@ const Status: FC<Props> = () => {
       </div>
       <div className="mb-2 flex">
         <Icon active={false} name="No Sound" />
-        <Icon name="Pause" />
+        <Icon name="Pause" animate />
       </div>
     </div>
   );
