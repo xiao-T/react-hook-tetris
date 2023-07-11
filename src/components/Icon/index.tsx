@@ -16,10 +16,10 @@ const Icon: FC<Props> = ({
   active = true,
   animate = false,
 }) => {
-  let opacityClassName = "opacity-1";
+  let opacityClassName = "opacity-100";
   let animateClassName = "";
   if (!active) {
-    opacityClassName = "opacity-0.2";
+    opacityClassName = "opacity-20";
   }
   if (animate) {
     animateClassName = "animate-flash";

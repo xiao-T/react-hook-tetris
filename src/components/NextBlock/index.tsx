@@ -12,7 +12,7 @@ const xy = {
   T: [0, 0],
 };
 
-const blockShape = {
+export const blockShape = {
   I: [[1, 1, 1, 1]],
   L: [
     [0, 0, 1],
@@ -43,12 +43,12 @@ const empty = [
   [0, 0, 0, 0],
   [0, 0, 0, 0],
 ];
-type ShapeType = keyof typeof blockShape;
+export type ShapeType = keyof typeof blockShape;
 type Props = {
   type?: ShapeType;
 };
 const NextBlock: FC<Props> = ({ type }): JSX.Element => {
-  let mergedShape: number[][] = empty;
+  const mergedShape: number[][] = empty.map((item) => [...item]);
   if (type) {
     blockShape[type].forEach((item, index) => {
       item.forEach((subItem, subIndex) => {

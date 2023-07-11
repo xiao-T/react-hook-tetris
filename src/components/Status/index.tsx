@@ -1,23 +1,35 @@
 // game status
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import StatusItem from "./Item";
 import Icon from "../Icon";
 import NextBlock from "../NextBlock";
+import GameContext from "../../store";
 
 type Props = {};
 
 const Status: FC<Props> = () => {
+  const { pause, mute, nextShape, level, startLine, gameStatus } =
+    useContext(GameContext);
   return (
     <div className="mx-4 flex w-full flex-col">
       <div className="flex-1">
-        <StatusItem label="得分" value="20" />
-        <StatusItem label="消除行" value="1" />
-        <StatusItem label="级别" value="0" />
-        <StatusItem label="下一个" render={() => <NextBlock type="O" />} />
+        <StatusItem label="得分" value={20} />
+        {gameStatus === "ing" && <StatusItem label="消除行" value={1} />}
+        {gameStatus === "unstarted" && (
+          <>
+            <StatusItem label="起始行" value={startLine} />
+            <StatusItem label="级别" value={level} />
+          </>
+        )}
+
+        <StatusItem
+          label="下一个"
+          render={() => <NextBlock type={nextShape} />}
+        />
       </div>
       <div className="mb-2 flex">
-        <Icon active={false} name="No Sound" />
-        <Icon name="Pause" animate />
+        <Icon name="No Sound" active={mute} />
+        <Icon name="Pause" active={false} animate={pause} />
       </div>
     </div>
   );
