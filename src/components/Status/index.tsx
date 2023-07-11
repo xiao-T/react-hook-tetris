@@ -1,7 +1,6 @@
 // game status
 import React, { FC } from "react";
 import StatusItem from "./Item";
-import Block from "../Block";
 import Icon from "../Icon";
 import NextBlock from "../NextBlock";
 

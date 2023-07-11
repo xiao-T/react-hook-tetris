@@ -10,7 +10,7 @@ const livePanel = {
 };
 const GameLive: FC<Props> = () => {
   return (
-    <div className="border border-black">
+    <div className="border border-black pb-[0.1rem] pl-[0.2rem] pr-[0.1rem] pt-[0.2rem]">
       {Array.from({ length: livePanel.rows }).map((_, index) => {
         return (
           <div key={index} className="flex">

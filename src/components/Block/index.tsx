@@ -18,7 +18,7 @@ const Block: FC<Props> = ({ active = false, isOpacity = false }) => {
   }
   return (
     <i
-      className={`after:content mb-[0.1rem] mr-[0.1rem] block h-[1rem] w-[1rem] border-[0.1rem] after:ml-[0.1rem] after:mt-[0.1rem] after:block after:h-[0.6rem] after:w-[0.6rem]  after:content-[''] ${blockColor} ${opacity}`}
+      className={`after:content mb-[0.1rem] mr-[0.1rem] block h-[1.2rem] w-[1.2rem] border-[0.1rem] after:ml-[0.1rem] after:mt-[0.1rem] after:block after:h-[0.8rem] after:w-[0.8rem]  after:content-[''] ${blockColor} ${opacity}`}
     />
   );
 };

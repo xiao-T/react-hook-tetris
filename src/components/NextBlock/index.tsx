@@ -39,11 +39,11 @@ const blockShape = {
     [1, 1, 1],
   ],
 };
-type ShapeType = keyof typeof blockShape;
 const empty = [
   [0, 0, 0, 0],
   [0, 0, 0, 0],
 ];
+type ShapeType = keyof typeof blockShape;
 type Props = {
   type?: ShapeType;
 };
