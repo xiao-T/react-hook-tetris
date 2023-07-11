@@ -5,6 +5,7 @@ import { ShapeType } from "../components/NextBlock";
 import { getNextBlockShape, MinLevel, MinStartLine } from "../units";
 import level from "./level";
 import startLine from "./startLine";
+import audioPlayer from "../audio";
 
 export type TState = {
   gameStatus?: "done" | "ing" | "unstarted";
@@ -16,6 +17,7 @@ export type TState = {
 };
 export const initState: TState = {
   gameStatus: "unstarted",
+  // gameStatus: "ing",
   pause: false,
   mute: false,
   nextShape: "I",
@@ -25,13 +27,21 @@ export const initState: TState = {
 
 type TLevel = "AddLevel" | "ReduceLevel";
 type TStartLine = "AddStartLine" | "ReduceStartLine";
+type TBlockAction = "Left" | "Right" | "Rotate" | "Down" | "Fall";
 type TAction = {
-  type: "Pause" | "Mute" | "Next" | "Start" | TLevel | TStartLine;
+  type:
+    | "Pause"
+    | "Mute"
+    | "Next"
+    | "Start"
+    | TBlockAction
+    | TLevel
+    | TStartLine;
   payload?: TState;
 };
 
 export const reducer = (state = initState, action: TAction) => {
-  const { payload = initState, type } = action;
+  const { payload, type } = action;
   const newState = Object.assign(
     {},
     {
@@ -39,6 +49,25 @@ export const reducer = (state = initState, action: TAction) => {
       ...payload,
     }
   );
+  if (!newState.mute) {
+    if (
+      type === "AddLevel" ||
+      type === "ReduceLevel" ||
+      type === "AddStartLine" ||
+      type === "ReduceStartLine" ||
+      type === "Down" ||
+      type === "Left" ||
+      type === "Right"
+    ) {
+      audioPlayer.move?.();
+    }
+    if (type === "Rotate") {
+      audioPlayer.rotate?.();
+    }
+    if (type === "Fall") {
+      audioPlayer.fall?.();
+    }
+  }
   switch (type) {
     case "Pause": {
       return newState;

@@ -38,21 +38,36 @@ const Panel = () => {
           <Button label="重玩" size="sm" bg="red" onClick={(e) => {}} />
         </div>
         <div className="mt-16">
-          <Button label="掉落" size="lg" onClick={() => {}} />
+          <Button
+            label="掉落"
+            size="lg"
+            onClick={() => {
+              dispatch({
+                type: "Fall",
+              });
+            }}
+          />
         </div>
       </div>
       <div className="flex-1">
-        <Button
-          label="旋转"
-          size="md"
-          onClick={() => {
-            if (gameStatus === "unstarted") {
-              dispatch({
-                type: "AddStartLine",
-              });
-            }
-          }}
-        />
+        <div className="flex justify-center">
+          <Button
+            label="旋转"
+            size="md"
+            onClick={() => {
+              if (gameStatus === "unstarted") {
+                dispatch({
+                  type: "AddStartLine",
+                });
+              } else {
+                console.log("rotate block");
+                dispatch({
+                  type: "Rotate",
+                });
+              }
+            }}
+          />
+        </div>
         <div className="flex justify-between">
           <Button
             label="左移"
@@ -61,6 +76,11 @@ const Panel = () => {
               if (gameStatus === "unstarted") {
                 dispatch({
                   type: "ReduceLevel",
+                });
+              } else {
+                console.log("move left block");
+                dispatch({
+                  type: "Left",
                 });
               }
             }}
@@ -73,21 +93,33 @@ const Panel = () => {
                 dispatch({
                   type: "AddLevel",
                 });
+              } else {
+                console.log("move right block");
+                dispatch({
+                  type: "Right",
+                });
               }
             }}
           />
         </div>
-        <Button
-          label="下移"
-          size="md"
-          onClick={() => {
-            if (gameStatus === "unstarted") {
-              dispatch({
-                type: "ReduceStartLine",
-              });
-            }
-          }}
-        />
+        <div className="flex justify-center">
+          <Button
+            label="下移"
+            size="md"
+            onClick={() => {
+              if (gameStatus === "unstarted") {
+                dispatch({
+                  type: "ReduceStartLine",
+                });
+              } else {
+                console.log("move down block");
+                dispatch({
+                  type: "Down",
+                });
+              }
+            }}
+          />
+        </div>
       </div>
     </div>
   );

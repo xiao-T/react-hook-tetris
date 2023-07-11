@@ -60,7 +60,7 @@ const NextBlock: FC<Props> = ({ type }): JSX.Element => {
   }
 
   return (
-    <div className="flex flex-col items-end">
+    <div className="mt-1 flex flex-col items-end">
       {mergedShape.map((item, index) => {
         return (
           <div key={index} className="flex">
