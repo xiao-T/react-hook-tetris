@@ -7,7 +7,7 @@ import audioPlayer from "../../audio";
 
 const Panel = () => {
   const { dispatch, ...rest } = useContext(GameContext);
-  const { pause, mute, gameStatus } = rest;
+  const { pause, mute, gameStatus, level } = rest;
   return (
     <div className="mx-8 flex">
       <div className="flex-1">
@@ -17,6 +17,13 @@ const Panel = () => {
             size="sm"
             bg="green"
             onClick={() => {
+              if (!pause) {
+                clearInterval(gameController.autoDownInterval!);
+              } else {
+                if (gameStatus === "ing") {
+                  gameController.auto(dispatch);
+                }
+              }
               dispatch({
                 type: "Pause",
                 payload: {
@@ -56,7 +63,7 @@ const Panel = () => {
                 if (!mute) {
                   audioPlayer.start?.();
                 }
-                gameController.start(dispatch);
+                gameController.start(dispatch, rest);
               }
             }}
           />

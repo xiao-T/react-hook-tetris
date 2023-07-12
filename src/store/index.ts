@@ -46,7 +46,7 @@ export const initState: TState = {
   nextShape: getNextBlockShape(),
   level: MinLevel,
   startLine: MinStartLine,
-  blockMap: getStartBlockMap(2),
+  blockMap: getStartBlockMap(),
   currentBlock: {
     shapeType: defaultCurrentBlock,
     X: Math.ceil((MaxColumns - blockShape[defaultCurrentBlock][0].length) / 2),

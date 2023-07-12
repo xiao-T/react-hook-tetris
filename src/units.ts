@@ -57,7 +57,8 @@ export const getStartBlockMap = (startLine: number = 0) => {
   return [...blockMap, ...startLines];
 };
 // game level
-export const MaxLevel = 6;
+export const levels = [900, 750, 600, 450, 300, 150];
+export const MaxLevel = levels.length;
 export const MinLevel = 1;
 // start line
 export const MaxStartLine = 10;

@@ -1,10 +1,12 @@
 // game controller
 import { Dispatch } from "react";
-import { TAction } from "../store";
+import { TAction, TState } from "../store";
+import { getStartBlockMap, levels } from "../units";
 
 type TGameController = {
-  autoDownInterval: ReturnType<typeof setInterval> | null;
-  start: (dispatch: Dispatch<TAction>) => void;
+  autoDownInterval: ReturnType<typeof setTimeout> | null;
+  delay: number;
+  start: (dispatch: Dispatch<TAction>, state: TState) => void;
   auto: (dispatch: Dispatch<TAction>) => void;
   left: (dispatch: Dispatch<TAction>) => void;
   right: (dispatch: Dispatch<TAction>) => void;
@@ -12,21 +14,31 @@ type TGameController = {
 };
 const gameController: TGameController = {
   autoDownInterval: null,
-  start: (dispatch: Dispatch<TAction>) => {
+  delay: 0,
+  start: (dispatch: Dispatch<TAction>, state: TState) => {
+    gameController.delay = levels[state?.level! - 1];
     dispatch({
       type: "Start",
       payload: {
         gameStatus: "ing",
+        blockMap: getStartBlockMap(state?.startLine),
       },
     });
     gameController.auto(dispatch);
   },
   auto: (dispatch: Dispatch<TAction>) => {
-    gameController.autoDownInterval = setInterval(() => {
+    dispatch({
+      type: "Pause",
+      payload: {
+        pause: false,
+      },
+    });
+    gameController.autoDownInterval = setTimeout(() => {
       dispatch({
         type: "Down",
       });
-    }, 500);
+      gameController.auto(dispatch);
+    }, gameController.delay);
   },
   left: (dispatch: Dispatch<TAction>) => {
     gameController.autoDownInterval &&
