@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import Block from "../Block";
+import { ShapeType, blockShape } from "../../units";
 
 // for next block
 const xy = {
@@ -12,38 +13,10 @@ const xy = {
   T: [0, 0],
 };
 
-export const blockShape = {
-  I: [[1, 1, 1, 1]],
-  L: [
-    [0, 0, 1],
-    [1, 1, 1],
-  ],
-  J: [
-    [1, 0, 0],
-    [1, 1, 1],
-  ],
-  Z: [
-    [1, 1, 0],
-    [0, 1, 1],
-  ],
-  S: [
-    [0, 1, 1],
-    [1, 1, 0],
-  ],
-  O: [
-    [1, 1],
-    [1, 1],
-  ],
-  T: [
-    [0, 1, 0],
-    [1, 1, 1],
-  ],
-};
 const empty = [
   [0, 0, 0, 0],
   [0, 0, 0, 0],
 ];
-export type ShapeType = keyof typeof blockShape;
 type Props = {
   type?: ShapeType;
 };

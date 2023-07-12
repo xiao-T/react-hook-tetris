@@ -2,9 +2,11 @@
 import React, { useContext } from "react";
 import Button from "./Button";
 import GameContext from "../../store";
+import gameController from "../../gameController";
 
 const Panel = () => {
-  const { dispatch, pause, mute, gameStatus } = useContext(GameContext);
+  const { dispatch, ...rest } = useContext(GameContext);
+  const { pause, mute, gameStatus } = rest;
   return (
     <div className="mx-8 flex">
       <div className="flex-1">
@@ -42,9 +44,13 @@ const Panel = () => {
             label="掉落"
             size="lg"
             onClick={() => {
-              dispatch({
-                type: "Fall",
-              });
+              if (gameStatus === "ing") {
+                dispatch({
+                  type: "Fall",
+                });
+              } else {
+                gameController.start(dispatch);
+              }
             }}
           />
         </div>
@@ -60,7 +66,6 @@ const Panel = () => {
                   type: "AddStartLine",
                 });
               } else {
-                console.log("rotate block");
                 dispatch({
                   type: "Rotate",
                 });
@@ -78,10 +83,7 @@ const Panel = () => {
                   type: "ReduceLevel",
                 });
               } else {
-                console.log("move left block");
-                dispatch({
-                  type: "Left",
-                });
+                gameController.left(dispatch);
               }
             }}
           />
@@ -94,10 +96,7 @@ const Panel = () => {
                   type: "AddLevel",
                 });
               } else {
-                console.log("move right block");
-                dispatch({
-                  type: "Right",
-                });
+                gameController.right(dispatch);
               }
             }}
           />
@@ -112,10 +111,7 @@ const Panel = () => {
                   type: "ReduceStartLine",
                 });
               } else {
-                console.log("move down block");
-                dispatch({
-                  type: "Down",
-                });
+                gameController.down(dispatch);
               }
             }}
           />

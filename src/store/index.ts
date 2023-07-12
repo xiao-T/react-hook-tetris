@@ -1,12 +1,32 @@
 // game store
 
 import { createContext, Dispatch } from "react";
-import { ShapeType } from "../components/NextBlock";
-import { getNextBlockShape, MinLevel, MinStartLine } from "../units";
+import {
+  blockShape,
+  getNextBlockShape,
+  getStartBlockMap,
+  MaxColumns,
+  MaxRows,
+  MinLevel,
+  MinStartLine,
+  ShapeType,
+} from "../units";
 import level from "./level";
 import startLine from "./startLine";
 import audioPlayer from "../audio";
+import move from "./move";
 
+export type TCurrentBlock = {
+  X: number;
+  Y: number;
+  shapeType: ShapeType;
+};
+export type TSafeArea = {
+  t: number;
+  r: number;
+  b: number;
+  l: number;
+};
 export type TState = {
   gameStatus?: "done" | "ing" | "unstarted";
   pause?: boolean;
@@ -14,21 +34,38 @@ export type TState = {
   nextShape?: ShapeType;
   level?: number;
   startLine?: number;
+  blockMap?: number[][];
+  currentBlock?: TCurrentBlock;
+  safeArea?: TSafeArea;
 };
+const defaultCurrentBlock = getNextBlockShape();
 export const initState: TState = {
   gameStatus: "unstarted",
   // gameStatus: "ing",
   pause: false,
   mute: false,
-  nextShape: "I",
+  nextShape: getNextBlockShape(),
   level: MinLevel,
   startLine: MinStartLine,
+  blockMap: getStartBlockMap(2),
+  currentBlock: {
+    shapeType: defaultCurrentBlock,
+    X: Math.ceil((MaxColumns - blockShape[defaultCurrentBlock][0].length) / 2),
+    Y: 0,
+  },
+  // need to be updated based on the current block and start line
+  safeArea: {
+    t: 0,
+    r: MaxColumns - blockShape[defaultCurrentBlock][0].length,
+    b: MaxRows - blockShape[defaultCurrentBlock].length,
+    l: 0,
+  },
 };
 
 type TLevel = "AddLevel" | "ReduceLevel";
 type TStartLine = "AddStartLine" | "ReduceStartLine";
 type TBlockAction = "Left" | "Right" | "Rotate" | "Down" | "Fall";
-type TAction = {
+export type TAction = {
   type:
     | "Pause"
     | "Mute"
@@ -49,6 +86,7 @@ export const reducer = (state = initState, action: TAction) => {
       ...payload,
     }
   );
+  // play game sound
   if (!newState.mute) {
     if (
       type === "AddLevel" ||
@@ -67,8 +105,14 @@ export const reducer = (state = initState, action: TAction) => {
     if (type === "Fall") {
       audioPlayer.fall?.();
     }
+    if (type === "Start") {
+      audioPlayer.start?.();
+    }
   }
   switch (type) {
+    case "Start": {
+      return newState;
+    }
     case "Pause": {
       return newState;
     }
@@ -94,6 +138,15 @@ export const reducer = (state = initState, action: TAction) => {
     }
     case "ReduceStartLine": {
       return startLine.reduce(state);
+    }
+    case "Left": {
+      return move.left(state);
+    }
+    case "Right": {
+      return move.right(state);
+    }
+    case "Down": {
+      return move.down(state);
     }
     default:
       return state;
