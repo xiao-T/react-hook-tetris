@@ -13,7 +13,6 @@ import {
 } from "../units";
 import level from "./level";
 import startLine from "./startLine";
-import audioPlayer from "../audio";
 import move from "./move";
 
 export type TCurrentBlock = {
@@ -86,29 +85,7 @@ export const reducer = (state = initState, action: TAction) => {
       ...payload,
     }
   );
-  // play game sound
-  if (!newState.mute) {
-    if (
-      type === "AddLevel" ||
-      type === "ReduceLevel" ||
-      type === "AddStartLine" ||
-      type === "ReduceStartLine" ||
-      type === "Down" ||
-      type === "Left" ||
-      type === "Right"
-    ) {
-      audioPlayer.move?.();
-    }
-    if (type === "Rotate") {
-      audioPlayer.rotate?.();
-    }
-    if (type === "Fall") {
-      audioPlayer.fall?.();
-    }
-    if (type === "Start") {
-      audioPlayer.start?.();
-    }
-  }
+
   switch (type) {
     case "Start": {
       return newState;

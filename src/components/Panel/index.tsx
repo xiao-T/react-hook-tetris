@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import Button from "./Button";
 import GameContext from "../../store";
 import gameController from "../../gameController";
+import audioPlayer from "../../audio";
 
 const Panel = () => {
   const { dispatch, ...rest } = useContext(GameContext);
@@ -45,10 +46,16 @@ const Panel = () => {
             size="lg"
             onClick={() => {
               if (gameStatus === "ing") {
+                if (!mute) {
+                  audioPlayer.fall?.();
+                }
                 dispatch({
                   type: "Fall",
                 });
               } else {
+                if (!mute) {
+                  audioPlayer.start?.();
+                }
                 gameController.start(dispatch);
               }
             }}
@@ -61,6 +68,9 @@ const Panel = () => {
             label="旋转"
             size="md"
             onClick={() => {
+              if (!mute) {
+                audioPlayer.rotate?.();
+              }
               if (gameStatus === "unstarted") {
                 dispatch({
                   type: "AddStartLine",
@@ -78,6 +88,9 @@ const Panel = () => {
             label="左移"
             size="md"
             onClick={() => {
+              if (!mute) {
+                audioPlayer.move?.();
+              }
               if (gameStatus === "unstarted") {
                 dispatch({
                   type: "ReduceLevel",
@@ -91,6 +104,9 @@ const Panel = () => {
             label="右移"
             size="md"
             onClick={() => {
+              if (!mute) {
+                audioPlayer.move?.();
+              }
               if (gameStatus === "unstarted") {
                 dispatch({
                   type: "AddLevel",
@@ -106,6 +122,9 @@ const Panel = () => {
             label="下移"
             size="md"
             onClick={() => {
+              if (!mute) {
+                audioPlayer.move?.();
+              }
               if (gameStatus === "unstarted") {
                 dispatch({
                   type: "ReduceStartLine",
