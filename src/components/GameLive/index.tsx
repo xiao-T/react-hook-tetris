@@ -7,7 +7,7 @@ import { blockShape } from "../../units";
 const GameLive: FC = () => {
   const { blockMap, currentBlock } = useContext(GameContext);
   const { X = 0, Y = 0 } = currentBlock || {};
-  const currentShape = currentBlock && blockShape[currentBlock?.shapeType];
+  const currentShape = currentBlock?.shape!;
   // merge `block map` and `current shape`
   const cachedBlockMap = blockMap?.map((item) => [...item]);
   currentShape?.forEach((item, index) => {

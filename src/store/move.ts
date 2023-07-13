@@ -1,50 +1,59 @@
 // move current block
 
+import { rotateBlock } from "../units";
 import { TCurrentBlock, TState } from "./index";
 
 const move = {
   left: (state: TState): TState => {
-    let { currentBlock } = state;
-    const cachedCurrentBlock = Object.assign({}, { ...currentBlock });
-    if (cachedCurrentBlock?.X) {
-      const X = cachedCurrentBlock.X || 0;
-      cachedCurrentBlock.X = X - 1;
+    const { currentBlock = {} as TCurrentBlock } = state;
+    let { X } = currentBlock;
+    if (X) {
+      X = X - 1;
     }
     return {
       ...state,
-      currentBlock: { ...cachedCurrentBlock } as TCurrentBlock,
+      currentBlock: { ...currentBlock, X },
     };
   },
   right: (state: TState): TState => {
-    const { currentBlock, safeArea } = state;
-    const cachedCurrentBlock = Object.assign({}, { ...currentBlock });
-    if (!isNaN(cachedCurrentBlock?.X!)) {
-      const X = cachedCurrentBlock.X || 0;
+    const { currentBlock = {} as TCurrentBlock, safeArea } = state;
+    let { X } = currentBlock;
+    if (!isNaN(X)) {
       // rightmost
       if (safeArea?.r && X >= safeArea.r) {
         return { ...state };
       }
-      cachedCurrentBlock.X = X + 1;
+      X = X + 1;
     }
     return {
       ...state,
-      currentBlock: { ...cachedCurrentBlock } as TCurrentBlock,
+      currentBlock: { ...currentBlock, X },
     };
   },
   down: (state: TState): TState => {
-    let { currentBlock, safeArea } = state;
-    const cachedCurrentBlock = Object.assign({}, { ...currentBlock });
-    if (!isNaN(cachedCurrentBlock?.Y!)) {
-      const Y = cachedCurrentBlock.Y || 0;
+    const { currentBlock = {} as TCurrentBlock, safeArea } = state;
+    let { Y } = currentBlock;
+    if (!isNaN(Y)) {
       // bottommost
       if (safeArea?.b && Y >= safeArea.b) {
         return { ...state };
       }
-      cachedCurrentBlock.Y = Y + 1;
+      Y = Y + 1;
     }
     return {
       ...state,
-      currentBlock: { ...cachedCurrentBlock } as TCurrentBlock,
+      currentBlock: { ...currentBlock, Y },
+    };
+  },
+  rotate: (state: TState): TState => {
+    let { currentBlock } = state;
+
+    return {
+      ...state,
+      currentBlock: {
+        ...currentBlock,
+        shape: rotateBlock(currentBlock?.shape!),
+      } as TCurrentBlock,
     };
   },
 };

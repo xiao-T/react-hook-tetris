@@ -63,3 +63,19 @@ export const MinLevel = 1;
 // start line
 export const MaxStartLine = 10;
 export const MinStartLine = 0;
+// rotate block
+type TShape = number[][];
+export const rotateBlock = (shape: TShape): TShape => {
+  const rows = shape.length;
+  const columns = shape[0].length;
+  const newShape = [];
+
+  for (let i = 0; i < columns; i++) {
+    let newRow = [];
+    for (let j = 0; j < rows; j++) {
+      newRow.push(shape[j][i]);
+    }
+    newShape.push(newRow.reverse());
+  }
+  return newShape;
+};

@@ -19,6 +19,7 @@ export type TCurrentBlock = {
   X: number;
   Y: number;
   shapeType: ShapeType;
+  shape: number[][];
 };
 export type TSafeArea = {
   t: number;
@@ -33,6 +34,7 @@ export type TState = {
   nextShape?: ShapeType;
   level?: number;
   startLine?: number;
+  clearLines?: number;
   blockMap?: number[][];
   currentBlock?: TCurrentBlock;
   safeArea?: TSafeArea;
@@ -46,11 +48,13 @@ export const initState: TState = {
   nextShape: getNextBlockShape(),
   level: MinLevel,
   startLine: MinStartLine,
+  clearLines: 0,
   blockMap: getStartBlockMap(),
   currentBlock: {
     shapeType: defaultCurrentBlock,
     X: Math.ceil((MaxColumns - blockShape[defaultCurrentBlock][0].length) / 2),
     Y: 0,
+    shape: blockShape[defaultCurrentBlock],
   },
   // need to be updated based on the current block and start line
   safeArea: {
@@ -124,6 +128,9 @@ export const reducer = (state = initState, action: TAction) => {
     }
     case "Down": {
       return move.down(state);
+    }
+    case "Rotate": {
+      return move.rotate(state);
     }
     default:
       return state;
