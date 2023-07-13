@@ -1,4 +1,3 @@
-// common functions
 // block shape
 export const blockShape = {
   I: [[1, 1, 1, 1]],
@@ -78,4 +77,22 @@ export const rotateBlock = (shape: TShape): TShape => {
     newShape.push(newRow.reverse());
   }
   return newShape;
+};
+// calculate safe area for current block
+export type TSafeArea = {
+  t: number;
+  r: number;
+  b: number;
+  l: number;
+};
+export const calcSafeArea = (shape: TShape): TSafeArea => {
+  const safeArea = {
+    t: 0,
+    r: 0,
+    b: 0,
+    l: 0,
+  };
+  safeArea.r = MaxColumns - shape[0].length;
+  safeArea.b = MaxRows - shape.length;
+  return safeArea;
 };

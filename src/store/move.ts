@@ -1,6 +1,6 @@
 // move current block
 
-import { rotateBlock } from "../units";
+import { MaxColumns, calcSafeArea, rotateBlock } from "../units";
 import { TCurrentBlock, TState } from "./index";
 
 const move = {
@@ -46,14 +46,22 @@ const move = {
     };
   },
   rotate: (state: TState): TState => {
-    let { currentBlock } = state;
-
+    const { currentBlock } = state;
+    const newShape = rotateBlock(currentBlock?.shape!);
+    // disable rotate, when`X + block length` is more than max columns
+    if (currentBlock?.X! + newShape[0].length! > MaxColumns) {
+      return { ...state };
+    }
+    const newSafeArea = calcSafeArea(newShape);
     return {
       ...state,
       currentBlock: {
         ...currentBlock,
-        shape: rotateBlock(currentBlock?.shape!),
+        shape: newShape,
       } as TCurrentBlock,
+      safeArea: {
+        ...newSafeArea,
+      },
     };
   },
 };

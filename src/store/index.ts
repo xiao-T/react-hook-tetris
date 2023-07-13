@@ -3,13 +3,14 @@
 import { createContext, Dispatch } from "react";
 import {
   blockShape,
+  calcSafeArea,
   getNextBlockShape,
   getStartBlockMap,
   MaxColumns,
-  MaxRows,
   MinLevel,
   MinStartLine,
   ShapeType,
+  TSafeArea,
 } from "../units";
 import level from "./level";
 import startLine from "./startLine";
@@ -20,12 +21,6 @@ export type TCurrentBlock = {
   Y: number;
   shapeType: ShapeType;
   shape: number[][];
-};
-export type TSafeArea = {
-  t: number;
-  r: number;
-  b: number;
-  l: number;
 };
 export type TState = {
   gameStatus?: "done" | "ing" | "unstarted";
@@ -57,12 +52,7 @@ export const initState: TState = {
     shape: blockShape[defaultCurrentBlock],
   },
   // need to be updated based on the current block and start line
-  safeArea: {
-    t: 0,
-    r: MaxColumns - blockShape[defaultCurrentBlock][0].length,
-    b: MaxRows - blockShape[defaultCurrentBlock].length,
-    l: 0,
-  },
+  safeArea: calcSafeArea(blockShape[defaultCurrentBlock]),
 };
 
 type TLevel = "AddLevel" | "ReduceLevel";
