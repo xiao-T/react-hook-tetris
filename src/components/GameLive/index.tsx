@@ -2,7 +2,6 @@
 import React, { FC, useContext } from "react";
 import Block from "../Block";
 import GameContext from "../../store";
-import { blockShape } from "../../units";
 
 const GameLive: FC = () => {
   const { blockMap, currentBlock } = useContext(GameContext);

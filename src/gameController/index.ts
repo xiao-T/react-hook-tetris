@@ -11,10 +11,13 @@ type TGameController = {
   left: (dispatch: Dispatch<TAction>) => void;
   right: (dispatch: Dispatch<TAction>) => void;
   down: (dispatch: Dispatch<TAction>) => void;
+  next: (state: TState) => void;
+  dispatch: Dispatch<TAction>;
 };
 const gameController: TGameController = {
   autoDownInterval: null,
   delay: 0,
+  dispatch: () => {},
   start: (dispatch: Dispatch<TAction>, state: TState) => {
     gameController.delay = levels[state?.level! - 1];
     dispatch({
@@ -24,6 +27,7 @@ const gameController: TGameController = {
         blockMap: getStartBlockMap(state?.startLine),
       },
     });
+    gameController.dispatch = dispatch;
     gameController.auto(dispatch);
   },
   auto: (dispatch: Dispatch<TAction>) => {
@@ -63,6 +67,14 @@ const gameController: TGameController = {
       type: "Down",
     });
     gameController.auto(dispatch);
+  },
+  next: (state: TState) => {
+    gameController.autoDownInterval &&
+      clearTimeout(gameController.autoDownInterval);
+    gameController.dispatch({
+      type: "Next",
+    });
+    gameController.auto(gameController.dispatch);
   },
 };
 export default gameController;

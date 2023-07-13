@@ -4,24 +4,19 @@ import { createContext, Dispatch } from "react";
 import {
   blockShape,
   calcSafeArea,
+  getCurrentBlock,
   getNextBlockShape,
   getStartBlockMap,
-  MaxColumns,
   MinLevel,
   MinStartLine,
   ShapeType,
+  TCurrentBlock,
   TSafeArea,
 } from "../units";
 import level from "./level";
 import startLine from "./startLine";
 import move from "./move";
 
-export type TCurrentBlock = {
-  X: number;
-  Y: number;
-  shapeType: ShapeType;
-  shape: number[][];
-};
 export type TState = {
   gameStatus?: "done" | "ing" | "unstarted";
   pause?: boolean;
@@ -30,6 +25,7 @@ export type TState = {
   level?: number;
   startLine?: number;
   clearLines?: number;
+  score?: number;
   blockMap?: number[][];
   currentBlock?: TCurrentBlock;
   safeArea?: TSafeArea;
@@ -44,13 +40,9 @@ export const initState: TState = {
   level: MinLevel,
   startLine: MinStartLine,
   clearLines: 0,
+  score: 0,
   blockMap: getStartBlockMap(),
-  currentBlock: {
-    shapeType: defaultCurrentBlock,
-    X: Math.ceil((MaxColumns - blockShape[defaultCurrentBlock][0].length) / 2),
-    Y: 0,
-    shape: blockShape[defaultCurrentBlock],
-  },
+  currentBlock: getCurrentBlock(defaultCurrentBlock),
   // need to be updated based on the current block and start line
   safeArea: calcSafeArea(blockShape[defaultCurrentBlock]),
 };
@@ -91,11 +83,15 @@ export const reducer = (state = initState, action: TAction) => {
       return newState;
     }
     case "Next": {
-      const nextShape = getNextBlockShape();
-      state.nextShape = nextShape;
+      const newNextShape = getNextBlockShape();
+      const newCurrentBlock = getCurrentBlock(newState.nextShape!);
       return {
-        ...state,
-        nextShape,
+        ...newState,
+        score: newState.score! + 10,
+        nextShape: newNextShape,
+        currentBlock: {
+          ...newCurrentBlock,
+        },
       };
     }
     case "AddLevel": {

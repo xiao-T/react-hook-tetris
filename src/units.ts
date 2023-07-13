@@ -96,3 +96,20 @@ export const calcSafeArea = (shape: TShape): TSafeArea => {
   safeArea.b = MaxRows - shape.length;
   return safeArea;
 };
+// generate current block based on next block
+export type TCurrentBlock = {
+  X: number;
+  Y: number;
+  shapeType: ShapeType;
+  shape: number[][];
+  isLock: boolean;
+};
+export const getCurrentBlock = (type: ShapeType): TCurrentBlock => {
+  return {
+    shapeType: type,
+    X: Math.ceil((MaxColumns - blockShape[type][0].length) / 2),
+    Y: 0,
+    shape: blockShape[type],
+    isLock: false,
+  };
+};

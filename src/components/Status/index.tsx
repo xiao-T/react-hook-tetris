@@ -8,12 +8,20 @@ import GameContext from "../../store";
 type Props = {};
 
 const Status: FC<Props> = () => {
-  const { pause, mute, nextShape, level, startLine, gameStatus, clearLines } =
-    useContext(GameContext);
+  const {
+    pause,
+    mute,
+    nextShape,
+    level,
+    startLine,
+    gameStatus,
+    clearLines,
+    score,
+  } = useContext(GameContext);
   return (
     <div className="mx-4 flex w-full flex-col">
       <div className="mt-2 flex-1">
-        <StatusItem label="得分" value={20} />
+        <StatusItem label="得分" value={score} />
         {gameStatus === "ing" && (
           <StatusItem label="消除行" value={clearLines} />
         )}

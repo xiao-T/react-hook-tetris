@@ -1,7 +1,8 @@
 // move current block
 
-import { MaxColumns, calcSafeArea, rotateBlock } from "../units";
-import { TCurrentBlock, TState } from "./index";
+import gameController from "../gameController";
+import { MaxColumns, TCurrentBlock, calcSafeArea, rotateBlock } from "../units";
+import { TState } from "./index";
 
 const move = {
   left: (state: TState): TState => {
@@ -36,7 +37,15 @@ const move = {
     if (!isNaN(Y)) {
       // bottommost
       if (safeArea?.b && Y >= safeArea.b) {
-        return { ...state };
+        // if the current block reaches bottom
+        // clear game controller timer
+        // and create new current block based on next block,
+        // then generate new next block
+        gameController.next(state);
+        return {
+          ...state,
+          currentBlock: { ...currentBlock, isLock: true },
+        };
       }
       Y = Y + 1;
     }

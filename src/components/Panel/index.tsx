@@ -7,7 +7,7 @@ import audioPlayer from "../../audio";
 
 const Panel = () => {
   const { dispatch, ...rest } = useContext(GameContext);
-  const { pause, mute, gameStatus, level } = rest;
+  const { pause, mute, gameStatus } = rest;
   return (
     <div className="mx-8 flex">
       <div className="flex-1">
