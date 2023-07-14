@@ -79,7 +79,7 @@ export const rotateBlock = (shape: TShape): TShape => {
   return newShape;
 };
 // calculate safe area for current block
-export type TSafeArea = {
+export type TRect = {
   t: number;
   r: number;
   b: number;
@@ -88,8 +88,8 @@ export type TSafeArea = {
 export const calcSafeArea = (
   currentBlock: TCurrentBlock,
   blockMap: TShape,
-  safeArea: TSafeArea
-): TSafeArea => {
+  safeArea: TRect
+): TRect => {
   const newSafeArea = {
     t: 0,
     r: 0,
@@ -108,7 +108,7 @@ export const calcSafeArea = (
 const getBottomEdge = (
   currentBlock: TCurrentBlock,
   blockMap: TShape,
-  safeArea: TSafeArea
+  safeArea: TRect
 ): number => {
   let bottom = safeArea.b;
   const { Y, X, shape } = currentBlock;
@@ -150,7 +150,6 @@ export type TCurrentBlock = {
   Y: number;
   shapeType: ShapeType;
   shape: number[][];
-  isLock: boolean;
 };
 export const getCurrentBlock = (type: ShapeType): TCurrentBlock => {
   return {
@@ -158,7 +157,6 @@ export const getCurrentBlock = (type: ShapeType): TCurrentBlock => {
     X: Math.ceil((MaxColumns - blockShape[type][0].length) / 2),
     Y: 0,
     shape: blockShape[type],
-    isLock: false,
   };
 };
 // merge the current block and block map
@@ -178,4 +176,30 @@ export const mergeCurrentBlockIntoBlockMap = (
     });
   });
   return cachedBlockMap;
+};
+
+// determine if the current block has been reached bottom
+// and block atom and the current block are overlapping
+type TPosition = {
+  x: number;
+  y: number;
+};
+export const isShouldBeLock = (
+  currentBlock: TCurrentBlock,
+  safeArea: TRect,
+  position: TPosition
+): boolean => {
+  const rect = {
+    t: currentBlock?.Y!,
+    l: currentBlock?.X!,
+    b: currentBlock?.Y! + currentBlock?.shape.length!,
+    r: currentBlock?.X! + currentBlock?.shape[0].length!,
+  };
+  return (
+    rect.l <= position.x &&
+    rect.r > position.x &&
+    rect.t <= position.y &&
+    rect.b > position.y &&
+    safeArea.b === currentBlock?.Y
+  );
 };

@@ -12,13 +12,14 @@ import {
   MinStartLine,
   ShapeType,
   TCurrentBlock,
-  TSafeArea,
+  TRect,
 } from "../units";
 import level from "./level";
 import startLine from "./startLine";
 import move from "./move";
 
 export type TState = {
+  lockStatus?: "ing" | "unlock";
   gameStatus?: "done" | "ing" | "unstarted";
   pause?: boolean;
   mute?: boolean;
@@ -30,12 +31,13 @@ export type TState = {
   helper?: boolean;
   blockMap?: number[][];
   currentBlock?: TCurrentBlock;
-  safeArea?: TSafeArea;
+  safeArea?: TRect;
 };
 const defaultCurrentBlockType = getNextBlockShape();
 const defaultCurrentBlock = getCurrentBlock(defaultCurrentBlockType);
 const defaultBlockMap = getStartBlockMap();
 export const initState: TState = {
+  lockStatus: "unlock",
   gameStatus: "unstarted",
   // gameStatus: "ing",
   pause: false,
@@ -66,6 +68,7 @@ export type TAction = {
     | "Mute"
     | "Next"
     | "Start"
+    | "Lock"
     | TBlockAction
     | TLevel
     | TStartLine;
@@ -83,6 +86,7 @@ export const reducer = (state = initState, action: TAction) => {
   );
 
   switch (type) {
+    case "Lock":
     case "Start": {
       return newState;
     }

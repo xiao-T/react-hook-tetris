@@ -3,21 +3,35 @@ import { Dispatch } from "react";
 import { TAction, TState } from "../store";
 import { getStartBlockMap, levels } from "../units";
 
+type TClear = "Lock" | "Auto";
 type TGameController = {
+  unlockTimer: ReturnType<typeof setTimeout> | null;
   autoDownInterval: ReturnType<typeof setTimeout> | null;
   delay: number;
+  clear: (type?: TClear) => void;
   start: (dispatch: Dispatch<TAction>, state: TState) => void;
   auto: (dispatch: Dispatch<TAction>) => void;
   left: (dispatch: Dispatch<TAction>) => void;
   right: (dispatch: Dispatch<TAction>) => void;
   down: (dispatch: Dispatch<TAction>) => void;
-  next: (state: TState) => void;
+  next: () => void;
+  lock: () => void;
   fall: (dispatch: Dispatch<TAction>) => void;
   dispatch: Dispatch<TAction>;
 };
 const gameController: TGameController = {
   autoDownInterval: null,
+  unlockTimer: null,
   delay: 0,
+  clear: (type?: TClear) => {
+    if (type === "Auto" || !type) {
+      gameController.autoDownInterval &&
+        clearTimeout(gameController.autoDownInterval);
+    }
+    if (type === "Lock" || !type) {
+      gameController.unlockTimer && clearTimeout(gameController.unlockTimer);
+    }
+  },
   dispatch: () => {},
   start: (dispatch: Dispatch<TAction>, state: TState) => {
     gameController.delay = levels[state?.level! - 1];
@@ -46,47 +60,52 @@ const gameController: TGameController = {
     }, gameController.delay);
   },
   left: (dispatch: Dispatch<TAction>) => {
-    gameController.autoDownInterval &&
-      clearInterval(gameController.autoDownInterval);
     dispatch({
       type: "Left",
     });
-    gameController.auto(dispatch);
   },
   right: (dispatch: Dispatch<TAction>) => {
-    gameController.autoDownInterval &&
-      clearInterval(gameController.autoDownInterval);
     dispatch({
       type: "Right",
     });
-    gameController.auto(dispatch);
   },
   down: (dispatch: Dispatch<TAction>) => {
-    gameController.autoDownInterval &&
-      clearInterval(gameController.autoDownInterval);
+    gameController.clear("Auto");
     dispatch({
       type: "Down",
     });
     gameController.auto(dispatch);
   },
   fall: (dispatch: Dispatch<TAction>) => {
-    gameController.autoDownInterval &&
-      clearInterval(gameController.autoDownInterval);
+    gameController.clear("Auto");
     dispatch({
       type: "Fall",
     });
-    dispatch({
-      type: "Next",
-    });
-    gameController.auto(dispatch);
   },
-  next: (state: TState) => {
-    gameController.autoDownInterval &&
-      clearTimeout(gameController.autoDownInterval);
+  next: () => {
+    gameController.clear("Auto");
     gameController.dispatch({
       type: "Next",
     });
     gameController.auto(gameController.dispatch);
+  },
+  lock: () => {
+    gameController.clear();
+    gameController.dispatch({
+      type: "Lock",
+      payload: {
+        lockStatus: "ing",
+      },
+    });
+    gameController.unlockTimer = setTimeout(() => {
+      gameController.dispatch({
+        type: "Lock",
+        payload: {
+          lockStatus: "unlock",
+        },
+      });
+      gameController.next();
+    }, 200);
   },
 };
 export default gameController;
