@@ -56,9 +56,7 @@ const Panel = () => {
                 if (!mute) {
                   audioPlayer.fall?.();
                 }
-                dispatch({
-                  type: "Fall",
-                });
+                gameController.fall(dispatch);
               } else {
                 if (!mute) {
                   audioPlayer.start?.();

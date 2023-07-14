@@ -12,6 +12,7 @@ type TGameController = {
   right: (dispatch: Dispatch<TAction>) => void;
   down: (dispatch: Dispatch<TAction>) => void;
   next: (state: TState) => void;
+  fall: (dispatch: Dispatch<TAction>) => void;
   dispatch: Dispatch<TAction>;
 };
 const gameController: TGameController = {
@@ -65,6 +66,17 @@ const gameController: TGameController = {
       clearInterval(gameController.autoDownInterval);
     dispatch({
       type: "Down",
+    });
+    gameController.auto(dispatch);
+  },
+  fall: (dispatch: Dispatch<TAction>) => {
+    gameController.autoDownInterval &&
+      clearInterval(gameController.autoDownInterval);
+    dispatch({
+      type: "Fall",
+    });
+    dispatch({
+      type: "Next",
     });
     gameController.auto(dispatch);
   },

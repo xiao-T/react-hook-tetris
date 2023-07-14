@@ -138,6 +138,9 @@ export const reducer = (state = initState, action: TAction) => {
     case "Rotate": {
       return move.rotate(state);
     }
+    case "Fall": {
+      return move.fall(state);
+    }
     default:
       return state;
   }

@@ -81,6 +81,20 @@ const move = {
       safeArea: newSafeArea,
     };
   },
+  fall: (state: TState): TState => {
+    const { currentBlock = {} as TCurrentBlock, safeArea, blockMap } = state;
+    let { Y } = currentBlock;
+    if (!isNaN(Y)) {
+      Y = safeArea?.b!;
+    }
+    const newBlock = { ...currentBlock, Y };
+    const newSafeArea = calcSafeArea(newBlock, blockMap!, safeArea!);
+    return {
+      ...state,
+      currentBlock: newBlock,
+      safeArea: newSafeArea,
+    };
+  },
 };
 
 export default move;
