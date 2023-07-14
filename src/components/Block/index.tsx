@@ -6,12 +6,14 @@ type Props = {
   active?: boolean;
   isOpacity?: boolean;
   isLock?: boolean;
+  isHelp?: boolean;
 };
 
 const Block: FC<Props> = ({
   active = false,
   isOpacity = false,
   isLock = false,
+  isHelp = false,
 }) => {
   let color = "text-[#879372]";
   let opacity = "opacity-100";
@@ -23,6 +25,9 @@ const Block: FC<Props> = ({
   }
   if (isOpacity) {
     opacity = "opacity-0";
+  }
+  if (isHelp && !active) {
+    opacity = "opacity-50";
   }
   return (
     <i

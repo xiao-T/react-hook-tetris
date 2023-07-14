@@ -2,11 +2,12 @@
 
 import { createContext, Dispatch } from "react";
 import {
-  blockShape,
   calcSafeArea,
   getCurrentBlock,
   getNextBlockShape,
   getStartBlockMap,
+  MaxColumns,
+  mergeCurrentBlockIntoBlockMap,
   MinLevel,
   MinStartLine,
   ShapeType,
@@ -26,11 +27,14 @@ export type TState = {
   startLine?: number;
   clearLines?: number;
   score?: number;
+  helper?: boolean;
   blockMap?: number[][];
   currentBlock?: TCurrentBlock;
   safeArea?: TSafeArea;
 };
-const defaultCurrentBlock = getNextBlockShape();
+const defaultCurrentBlockType = getNextBlockShape();
+const defaultCurrentBlock = getCurrentBlock(defaultCurrentBlockType);
+const defaultBlockMap = getStartBlockMap();
 export const initState: TState = {
   gameStatus: "unstarted",
   // gameStatus: "ing",
@@ -41,10 +45,16 @@ export const initState: TState = {
   startLine: MinStartLine,
   clearLines: 0,
   score: 0,
-  blockMap: getStartBlockMap(),
-  currentBlock: getCurrentBlock(defaultCurrentBlock),
-  // need to be updated based on the current block and start line
-  safeArea: calcSafeArea(blockShape[defaultCurrentBlock]),
+  helper: !false,
+  blockMap: defaultBlockMap,
+  currentBlock: defaultCurrentBlock,
+  // need to be updated based on the current block and block map
+  safeArea: calcSafeArea(defaultCurrentBlock, defaultBlockMap, {
+    t: 0,
+    l: 0,
+    r: MaxColumns,
+    b: MaxColumns,
+  }),
 };
 
 type TLevel = "AddLevel" | "ReduceLevel";
@@ -85,6 +95,14 @@ export const reducer = (state = initState, action: TAction) => {
     case "Next": {
       const newNextShape = getNextBlockShape();
       const newCurrentBlock = getCurrentBlock(newState.nextShape!);
+      const newBlockMap = mergeCurrentBlockIntoBlockMap(
+        newState.currentBlock!,
+        newState.blockMap!
+      );
+      const newSafeArea = {
+        ...newState.safeArea!,
+        b: newState?.safeArea!.b - 2,
+      };
       return {
         ...newState,
         score: newState.score! + 10,
@@ -92,6 +110,8 @@ export const reducer = (state = initState, action: TAction) => {
         currentBlock: {
           ...newCurrentBlock,
         },
+        blockMap: newBlockMap,
+        safeArea: { ...newSafeArea },
       };
     }
     case "AddLevel": {

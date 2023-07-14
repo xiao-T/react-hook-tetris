@@ -6,33 +6,39 @@ import { TState } from "./index";
 
 const move = {
   left: (state: TState): TState => {
-    const { currentBlock = {} as TCurrentBlock } = state;
+    const { currentBlock = {} as TCurrentBlock, blockMap, safeArea } = state;
     let { X } = currentBlock;
     if (X) {
       X = X - 1;
     }
+    const newBlock = { ...currentBlock, X };
+    const newSafeArea = calcSafeArea(newBlock, blockMap!, safeArea!);
     return {
       ...state,
-      currentBlock: { ...currentBlock, X },
+      currentBlock: newBlock,
+      safeArea: newSafeArea,
     };
   },
   right: (state: TState): TState => {
-    const { currentBlock = {} as TCurrentBlock, safeArea } = state;
-    let { X } = currentBlock;
+    const { currentBlock = {} as TCurrentBlock, blockMap, safeArea } = state;
+    let { X, shape } = currentBlock;
     if (!isNaN(X)) {
       // rightmost
-      if (safeArea?.r && X >= safeArea.r) {
+      if (X + shape[0].length >= MaxColumns) {
         return { ...state };
       }
       X = X + 1;
     }
+    const newBlock = { ...currentBlock, X };
+    const newSafeArea = calcSafeArea(newBlock, blockMap!, safeArea!);
     return {
       ...state,
-      currentBlock: { ...currentBlock, X },
+      currentBlock: newBlock,
+      safeArea: newSafeArea,
     };
   },
   down: (state: TState): TState => {
-    const { currentBlock = {} as TCurrentBlock, safeArea } = state;
+    const { currentBlock = {} as TCurrentBlock, safeArea, blockMap } = state;
     let { Y } = currentBlock;
     if (!isNaN(Y)) {
       // bottommost
@@ -49,28 +55,30 @@ const move = {
       }
       Y = Y + 1;
     }
+    const newBlock = { ...currentBlock, Y };
+    const newSafeArea = calcSafeArea(newBlock, blockMap!, safeArea!);
     return {
       ...state,
-      currentBlock: { ...currentBlock, Y },
+      currentBlock: newBlock,
+      safeArea: newSafeArea,
     };
   },
   rotate: (state: TState): TState => {
-    const { currentBlock } = state;
+    const { currentBlock, blockMap, safeArea } = state;
     const newShape = rotateBlock(currentBlock?.shape!);
     // disable rotate, when`X + block length` is more than max columns
     if (currentBlock?.X! + newShape[0].length! > MaxColumns) {
       return { ...state };
     }
-    const newSafeArea = calcSafeArea(newShape);
+    const newBlock: TCurrentBlock = {
+      ...currentBlock!,
+      shape: newShape,
+    };
+    const newSafeArea = calcSafeArea(newBlock, blockMap!, safeArea!);
     return {
       ...state,
-      currentBlock: {
-        ...currentBlock,
-        shape: newShape,
-      } as TCurrentBlock,
-      safeArea: {
-        ...newSafeArea,
-      },
+      currentBlock: newBlock,
+      safeArea: newSafeArea,
     };
   },
 };
