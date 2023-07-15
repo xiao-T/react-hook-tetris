@@ -1,7 +1,7 @@
 // game controller
 import { Dispatch } from "react";
 import { TAction, TState } from "../store";
-import { getStartBlockMap, levels } from "../units";
+import { getBottomEdge, getStartBlockMap, levels } from "../units";
 
 type TClear = "Lock" | "Auto";
 type TGameController = {
@@ -34,12 +34,18 @@ const gameController: TGameController = {
   },
   dispatch: () => {},
   start: (dispatch: Dispatch<TAction>, state: TState) => {
+    const { currentBlock, startLine } = state;
     gameController.delay = levels[state?.level! - 1];
+    const blockMap = getStartBlockMap(startLine);
     dispatch({
       type: "Start",
       payload: {
         gameStatus: "ing",
-        blockMap: getStartBlockMap(state?.startLine),
+        blockMap,
+        bottomEdge: getBottomEdge(blockMap, currentBlock!, {
+          x: currentBlock?.X!,
+          y: currentBlock?.Y!,
+        }),
       },
     });
     gameController.dispatch = dispatch;

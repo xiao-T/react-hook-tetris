@@ -2,17 +2,15 @@
 
 import { createContext, Dispatch } from "react";
 import {
-  calcSafeArea,
+  getBottomEdge,
   getCurrentBlock,
   getNextBlockShape,
   getStartBlockMap,
-  MaxColumns,
   mergeCurrentBlockIntoBlockMap,
   MinLevel,
   MinStartLine,
   ShapeType,
   TCurrentBlock,
-  TRect,
 } from "../units";
 import level from "./level";
 import startLine from "./startLine";
@@ -31,7 +29,7 @@ export type TState = {
   helper?: boolean;
   blockMap?: number[][];
   currentBlock?: TCurrentBlock;
-  safeArea?: TRect;
+  bottomEdge?: number;
 };
 const defaultCurrentBlockType = getNextBlockShape();
 const defaultCurrentBlock = getCurrentBlock(defaultCurrentBlockType);
@@ -51,11 +49,9 @@ export const initState: TState = {
   blockMap: defaultBlockMap,
   currentBlock: defaultCurrentBlock,
   // need to be updated based on the current block and block map
-  safeArea: calcSafeArea(defaultCurrentBlock, defaultBlockMap, {
-    t: 0,
-    l: 0,
-    r: MaxColumns,
-    b: MaxColumns,
+  bottomEdge: getBottomEdge(defaultBlockMap, defaultCurrentBlock, {
+    x: defaultCurrentBlock.X,
+    y: defaultCurrentBlock.Y,
   }),
 };
 
@@ -103,10 +99,6 @@ export const reducer = (state = initState, action: TAction) => {
         newState.currentBlock!,
         newState.blockMap!
       );
-      const newSafeArea = {
-        ...newState.safeArea!,
-        b: newState?.safeArea!.b - 2,
-      };
       return {
         ...newState,
         score: newState.score! + 10,
@@ -115,7 +107,10 @@ export const reducer = (state = initState, action: TAction) => {
           ...newCurrentBlock,
         },
         blockMap: newBlockMap,
-        safeArea: { ...newSafeArea },
+        bottomEdge: getBottomEdge(newBlockMap, newCurrentBlock, {
+          x: newCurrentBlock.X,
+          y: newCurrentBlock.Y,
+        }),
       };
     }
     case "AddLevel": {

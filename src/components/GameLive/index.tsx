@@ -5,7 +5,7 @@ import GameContext from "../../store";
 import { isShouldBeLock, mergeCurrentBlockIntoBlockMap } from "../../units";
 
 const GameLive: FC = () => {
-  const { blockMap, currentBlock, safeArea, helper, lockStatus } =
+  const { blockMap, currentBlock, helper, lockStatus, bottomEdge } =
     useContext(GameContext);
   const liveBlockMap = mergeCurrentBlockIntoBlockMap(currentBlock!, blockMap!);
   return (
@@ -19,11 +19,11 @@ const GameLive: FC = () => {
                   active={item === 1}
                   isHelp={
                     helper &&
-                    subIndex + 1 > safeArea?.l! &&
-                    subIndex + 1 < safeArea?.r!
+                    subIndex + 1 > currentBlock?.X! &&
+                    subIndex < currentBlock?.X! + currentBlock?.shape[0].length!
                   }
                   isLock={
-                    isShouldBeLock(currentBlock!, safeArea!, {
+                    isShouldBeLock(currentBlock!, bottomEdge!, {
                       x: subIndex,
                       y: index,
                     }) &&

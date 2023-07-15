@@ -1,40 +1,44 @@
 // move current block
 
 import gameController from "../gameController";
-import { MaxColumns, TCurrentBlock, calcSafeArea, rotateBlock } from "../units";
+import {
+  MaxColumns,
+  TCurrentBlock,
+  canBePlaced,
+  getBottomEdge,
+  rotateBlock,
+} from "../units";
 import { TState } from "./index";
 
 const move = {
   left: (state: TState): TState => {
-    const {
-      currentBlock = {} as TCurrentBlock,
-      blockMap,
-      safeArea,
-      lockStatus,
-    } = state;
-    console.log(lockStatus);
+    const { currentBlock = {} as TCurrentBlock, blockMap, lockStatus } = state;
     if (lockStatus === "ing") {
       return { ...state };
     }
     let { X } = currentBlock;
     if (X) {
-      X = X - 1;
+      const shouldUpdate = canBePlaced(blockMap!, currentBlock, {
+        x: X - 1,
+        y: currentBlock.Y,
+      });
+      if (shouldUpdate) {
+        X = X - 1;
+      }
     }
+
     const newBlock = { ...currentBlock, X };
-    const newSafeArea = calcSafeArea(newBlock, blockMap!, safeArea!);
     return {
       ...state,
       currentBlock: newBlock,
-      safeArea: newSafeArea,
+      bottomEdge: getBottomEdge(blockMap!, currentBlock, {
+        x: X,
+        y: currentBlock.Y,
+      }),
     };
   },
   right: (state: TState): TState => {
-    const {
-      currentBlock = {} as TCurrentBlock,
-      blockMap,
-      safeArea,
-      lockStatus,
-    } = state;
+    const { currentBlock = {} as TCurrentBlock, blockMap, lockStatus } = state;
     if (lockStatus === "ing") {
       return { ...state };
     }
@@ -44,22 +48,36 @@ const move = {
       if (X + shape[0].length >= MaxColumns) {
         return { ...state };
       }
-      X = X + 1;
+      const shouldUpdate = canBePlaced(blockMap!, currentBlock, {
+        x: X + 1,
+        y: currentBlock.Y,
+      });
+      if (shouldUpdate) {
+        X = X + 1;
+      }
     }
     const newBlock = { ...currentBlock, X };
-    const newSafeArea = calcSafeArea(newBlock, blockMap!, safeArea!);
     return {
       ...state,
       currentBlock: newBlock,
-      safeArea: newSafeArea,
+      bottomEdge: getBottomEdge(blockMap!, currentBlock, {
+        x: X,
+        y: currentBlock.Y,
+      }),
     };
   },
   down: (state: TState, type?: "fall"): TState => {
-    const { currentBlock = {} as TCurrentBlock, safeArea, blockMap } = state;
-    let { Y } = currentBlock;
+    const { currentBlock = {} as TCurrentBlock, blockMap } = state;
+    let { Y, X } = currentBlock;
     if (!isNaN(Y)) {
       // bottommost
-      if (Y >= safeArea?.b!) {
+      const shouldUpdate = canBePlaced(blockMap!, currentBlock, {
+        x: X,
+        y: Y + 1,
+      });
+      if (shouldUpdate) {
+        Y = Y + 1;
+      } else {
         // if the current block reaches bottom
         // clear game controller timer
         // and create new current block based on next block,
@@ -69,23 +87,15 @@ const move = {
           ...state,
         };
       }
-      if (type) {
-        Y = safeArea?.b!;
-        gameController.lock();
-      } else {
-        Y = Y + 1;
-      }
     }
     const newBlock = { ...currentBlock, Y };
-    const newSafeArea = calcSafeArea(newBlock, blockMap!, safeArea!);
     return {
       ...state,
       currentBlock: newBlock,
-      safeArea: newSafeArea,
     };
   },
   rotate: (state: TState): TState => {
-    const { currentBlock, blockMap, safeArea } = state;
+    const { currentBlock, blockMap } = state;
     const newShape = rotateBlock(currentBlock?.shape!);
     // disable rotate, when`X + block length` is more than max columns
     if (currentBlock?.X! + newShape[0].length! > MaxColumns) {
@@ -95,26 +105,26 @@ const move = {
       ...currentBlock!,
       shape: newShape,
     };
-    const newSafeArea = calcSafeArea(newBlock, blockMap!, safeArea!);
     return {
       ...state,
       currentBlock: newBlock,
-      safeArea: newSafeArea,
+      bottomEdge: getBottomEdge(blockMap!, newBlock, {
+        x: newBlock.X,
+        y: newBlock.Y,
+      }),
     };
   },
   fall: (state: TState): TState => {
-    const { currentBlock = {} as TCurrentBlock, safeArea, blockMap } = state;
+    const { currentBlock = {} as TCurrentBlock, bottomEdge } = state;
     let { Y } = currentBlock;
     if (!isNaN(Y)) {
-      Y = safeArea?.b!;
+      Y = bottomEdge!;
     }
     const newBlock = { ...currentBlock, Y };
-    const newSafeArea = calcSafeArea(newBlock, blockMap!, safeArea!);
     gameController.lock();
     return {
       ...state,
       currentBlock: newBlock,
-      safeArea: newSafeArea,
     };
     // TODO
     // return move.down(state, "fall");
