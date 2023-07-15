@@ -15,16 +15,14 @@ const Status: FC<Props> = () => {
     level,
     startLine,
     gameStatus,
-    clearLines,
     score,
+    cleared,
   } = useContext(GameContext);
   return (
     <div className="mx-4 flex w-full flex-col">
       <div className="mt-2 flex-1">
         <StatusItem label="得分" value={score} />
-        {gameStatus === "ing" && (
-          <StatusItem label="消除行" value={clearLines} />
-        )}
+        {gameStatus === "ing" && <StatusItem label="消除行" value={cleared} />}
         {gameStatus === "unstarted" && (
           <StatusItem label="起始行" value={startLine} />
         )}

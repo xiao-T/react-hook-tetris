@@ -7,6 +7,7 @@ type Props = {
   isOpacity?: boolean;
   isLock?: boolean;
   isHelp?: boolean;
+  flash?: boolean;
 };
 
 const Block: FC<Props> = ({
@@ -14,13 +15,14 @@ const Block: FC<Props> = ({
   isOpacity = false,
   isLock = false,
   isHelp = false,
+  flash = false,
 }) => {
   let color = "text-[#879372]";
   let opacity = "opacity-100";
   if (active) {
     color = "text-[#000]";
   }
-  if (isLock) {
+  if (isLock || flash) {
     color = "text-[#560000]";
   }
   if (isOpacity) {

@@ -1,3 +1,5 @@
+// scores
+export const clearPoints = [100, 300, 700, 1500];
 // block shape
 export const blockShape = {
   I: [[1, 1, 1, 1]],
@@ -252,4 +254,29 @@ export const getBottomEdge = (
     }
   }
   return bottomEdge;
+};
+
+// find clear lines
+export const getClearLines = (blockMap: TShape): number[] => {
+  const fillFullRows: number[] = [];
+  blockMap.forEach((item, index) => {
+    const count = item.reduce((p, n) => p + n);
+    if (count === MaxColumns) {
+      fillFullRows.push(index);
+    }
+  });
+  return fillFullRows;
+};
+// create new block patch
+export const getBlockPatch = (length: number): TShape => {
+  const patch = [];
+  const blankRow = [];
+  for (let i = 0; i < MaxColumns; i++) {
+    blankRow.push(0);
+  }
+  while (length) {
+    patch.push(blankRow);
+    length--;
+  }
+  return patch;
 };

@@ -2,11 +2,12 @@
 
 import { createContext, Dispatch } from "react";
 import {
+  clearPoints,
+  getBlockPatch,
   getBottomEdge,
   getCurrentBlock,
   getNextBlockShape,
   getStartBlockMap,
-  mergeCurrentBlockIntoBlockMap,
   MinLevel,
   MinStartLine,
   ShapeType,
@@ -24,9 +25,11 @@ export type TState = {
   nextShape?: ShapeType;
   level?: number;
   startLine?: number;
-  clearLines?: number;
+  clearLines?: number[];
+  cleared?: number;
   score?: number;
   helper?: boolean;
+  flash?: boolean;
   blockMap?: number[][];
   currentBlock?: TCurrentBlock;
   bottomEdge?: number;
@@ -43,9 +46,11 @@ export const initState: TState = {
   nextShape: getNextBlockShape(),
   level: MinLevel,
   startLine: MinStartLine,
-  clearLines: 0,
+  clearLines: [],
   score: 0,
+  cleared: 0,
   helper: !false,
+  flash: false,
   blockMap: defaultBlockMap,
   currentBlock: defaultCurrentBlock,
   // need to be updated based on the current block and block map
@@ -65,6 +70,8 @@ export type TAction = {
     | "Next"
     | "Start"
     | "Lock"
+    | "Flash"
+    | "Clear"
     | TBlockAction
     | TLevel
     | TStartLine;
@@ -82,23 +89,41 @@ export const reducer = (state = initState, action: TAction) => {
   );
 
   switch (type) {
-    case "Lock":
-    case "Start": {
+    case "Start":
+    case "Pause":
+    case "Mute":
+    case "Flash":
+    case "Lock": {
       return newState;
     }
-    case "Pause": {
-      return newState;
-    }
-    case "Mute": {
-      return newState;
+    case "Clear": {
+      // clear up all full fill row
+      // and update cleared count
+      // and update score
+      const { blockMap, clearLines, cleared, score } = newState;
+      const newBlockMap = blockMap?.filter(
+        (_, index) => !clearLines?.includes(index)
+      );
+      const len = clearLines?.length;
+      const blockMapPatch = getBlockPatch(len!);
+      const emptyBlock: TCurrentBlock = {
+        X: 0,
+        Y: 0,
+        shape: [[]],
+        shapeType: "T",
+      };
+      return {
+        ...newState,
+        blockMap: blockMapPatch.concat(newBlockMap!),
+        currentBlock: emptyBlock,
+        clearLines: [],
+        cleared: cleared! + len!,
+        score: clearPoints[len! - 1] + score!,
+      };
     }
     case "Next": {
       const newNextShape = getNextBlockShape();
       const newCurrentBlock = getCurrentBlock(newState.nextShape!);
-      const newBlockMap = mergeCurrentBlockIntoBlockMap(
-        newState.currentBlock!,
-        newState.blockMap!
-      );
       return {
         ...newState,
         score: newState.score! + 10,
@@ -106,8 +131,7 @@ export const reducer = (state = initState, action: TAction) => {
         currentBlock: {
           ...newCurrentBlock,
         },
-        blockMap: newBlockMap,
-        bottomEdge: getBottomEdge(newBlockMap, newCurrentBlock, {
+        bottomEdge: getBottomEdge(newState.blockMap!, newCurrentBlock, {
           x: newCurrentBlock.X,
           y: newCurrentBlock.Y,
         }),

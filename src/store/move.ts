@@ -1,11 +1,14 @@
 // move current block
 
+import audioPlayer from "../audio";
 import gameController from "../gameController";
 import {
   MaxColumns,
   TCurrentBlock,
   canBePlaced,
   getBottomEdge,
+  getClearLines,
+  mergeCurrentBlockIntoBlockMap,
   rotateBlock,
 } from "../units";
 import { TState } from "./index";
@@ -66,27 +69,40 @@ const move = {
       }),
     };
   },
-  down: (state: TState, type?: "fall"): TState => {
-    const { currentBlock = {} as TCurrentBlock, blockMap } = state;
+  down: (state: TState): TState => {
+    const { currentBlock = {} as TCurrentBlock, blockMap, bottomEdge } = state;
     let { Y, X } = currentBlock;
-    if (!isNaN(Y)) {
-      // bottommost
+    if (!isNaN(Y) && bottomEdge! > Y) {
       const shouldUpdate = canBePlaced(blockMap!, currentBlock, {
         x: X,
         y: Y + 1,
       });
       if (shouldUpdate) {
         Y = Y + 1;
+      }
+    } else {
+      const newBlockMap = mergeCurrentBlockIntoBlockMap(
+        currentBlock,
+        blockMap!
+      );
+      const clearLines = getClearLines(newBlockMap);
+      if (clearLines.length) {
+        // if there are full fill lines
+        // need to clear it
+        audioPlayer.clear?.();
+        gameController.flash();
       } else {
         // if the current block reaches bottom
         // clear game controller timer
         // and create new current block based on next block,
         // then generate new next block
         gameController.lock();
-        return {
-          ...state,
-        };
       }
+      return {
+        ...state,
+        clearLines,
+        blockMap: newBlockMap,
+      };
     }
     const newBlock = { ...currentBlock, Y };
     return {
@@ -115,19 +131,26 @@ const move = {
     };
   },
   fall: (state: TState): TState => {
-    const { currentBlock = {} as TCurrentBlock, bottomEdge } = state;
+    const { currentBlock = {} as TCurrentBlock, bottomEdge, blockMap } = state;
     let { Y } = currentBlock;
     if (!isNaN(Y)) {
       Y = bottomEdge!;
     }
     const newBlock = { ...currentBlock, Y };
-    gameController.lock();
+    const newBlockMap = mergeCurrentBlockIntoBlockMap(newBlock, blockMap!);
+    const clearLines = getClearLines(newBlockMap);
+    if (clearLines.length) {
+      audioPlayer.clear?.();
+      gameController.flash();
+    } else {
+      gameController.lock();
+    }
     return {
       ...state,
+      clearLines,
+      blockMap: newBlockMap,
       currentBlock: newBlock,
     };
-    // TODO
-    // return move.down(state, "fall");
   },
 };
 

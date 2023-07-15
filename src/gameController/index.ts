@@ -3,11 +3,13 @@ import { Dispatch } from "react";
 import { TAction, TState } from "../store";
 import { getBottomEdge, getStartBlockMap, levels } from "../units";
 
-type TClear = "Lock" | "Auto";
+type TClear = "Lock" | "Auto" | "Flash";
 type TGameController = {
+  flashTimer: ReturnType<typeof setTimeout> | null;
   unlockTimer: ReturnType<typeof setTimeout> | null;
   autoDownInterval: ReturnType<typeof setTimeout> | null;
   delay: number;
+  flashCount: number;
   clear: (type?: TClear) => void;
   start: (dispatch: Dispatch<TAction>, state: TState) => void;
   auto: (dispatch: Dispatch<TAction>) => void;
@@ -16,13 +18,16 @@ type TGameController = {
   down: (dispatch: Dispatch<TAction>) => void;
   next: () => void;
   lock: () => void;
+  flash: () => void;
   fall: (dispatch: Dispatch<TAction>) => void;
   dispatch: Dispatch<TAction>;
 };
 const gameController: TGameController = {
+  flashTimer: null,
   autoDownInterval: null,
   unlockTimer: null,
   delay: 0,
+  flashCount: 0,
   clear: (type?: TClear) => {
     if (type === "Auto" || !type) {
       gameController.autoDownInterval &&
@@ -30,6 +35,9 @@ const gameController: TGameController = {
     }
     if (type === "Lock" || !type) {
       gameController.unlockTimer && clearTimeout(gameController.unlockTimer);
+    }
+    if (type === "Flash" || !type) {
+      gameController.flashTimer && clearInterval(gameController.flashTimer);
     }
   },
   dispatch: () => {},
@@ -97,12 +105,14 @@ const gameController: TGameController = {
   },
   lock: () => {
     gameController.clear();
+    // lock current block
     gameController.dispatch({
       type: "Lock",
       payload: {
         lockStatus: "ing",
       },
     });
+    // unlock block map, then get next block
     gameController.unlockTimer = setTimeout(() => {
       gameController.dispatch({
         type: "Lock",
@@ -112,6 +122,34 @@ const gameController: TGameController = {
       });
       gameController.next();
     }, 200);
+  },
+  flash: () => {
+    gameController.clear();
+    gameController.flashCount++;
+    if (gameController.flashCount > 6) {
+      gameController.clear("Flash");
+      gameController.dispatch({
+        type: "Flash",
+        payload: {
+          flash: false,
+        },
+      });
+      gameController.dispatch({
+        type: "Clear",
+      });
+      gameController.next();
+      gameController.flashCount = 0;
+      return;
+    }
+    gameController.flashTimer = setTimeout(() => {
+      gameController.dispatch({
+        type: "Flash",
+        payload: {
+          flash: gameController.flashCount % 2 === 0,
+        },
+      });
+      gameController.flash();
+    }, 100);
   },
 };
 export default gameController;

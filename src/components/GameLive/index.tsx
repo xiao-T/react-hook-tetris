@@ -5,8 +5,15 @@ import GameContext from "../../store";
 import { isShouldBeLock, mergeCurrentBlockIntoBlockMap } from "../../units";
 
 const GameLive: FC = () => {
-  const { blockMap, currentBlock, helper, lockStatus, bottomEdge } =
-    useContext(GameContext);
+  const {
+    blockMap,
+    currentBlock,
+    helper,
+    lockStatus,
+    bottomEdge,
+    flash,
+    clearLines,
+  } = useContext(GameContext);
   const liveBlockMap = mergeCurrentBlockIntoBlockMap(currentBlock!, blockMap!);
   return (
     <div className="border border-black pb-[0.1rem] pl-[0.2rem] pr-[0.1rem] pt-[0.2rem]">
@@ -30,6 +37,7 @@ const GameLive: FC = () => {
                     item === 1 &&
                     lockStatus === "ing"
                   }
+                  flash={flash && clearLines?.includes(index)}
                   key={`${index}_${subIndex}`}
                 />
               );
