@@ -29,6 +29,21 @@ export const blockShape = {
   ],
 };
 export type ShapeType = keyof typeof blockShape;
+// create block row
+type TBlockRow = number[];
+type TBlockType = "Blank" | "Fill";
+const getBlockRow = (type: TBlockType): TBlockRow => {
+  const blankRow = [];
+  for (let i = 0; i < MaxColumns; i++) {
+    if (type === "Blank") {
+      blankRow.push(0);
+    }
+    if (type === "Fill") {
+      blankRow.push(1);
+    }
+  }
+  return blankRow;
+};
 // get next block shape
 export const getNextBlockShape = (): ShapeType => {
   const keys = Object.keys(blockShape);
@@ -39,11 +54,8 @@ export const MaxRows = 20;
 export const MaxColumns = 10;
 export const getStartBlockMap = (startLine: number = 0) => {
   const blockMap = [];
-  const row = [];
+  const row = getBlockRow("Blank");
   const startLines = [];
-  for (let i = 0; i < MaxColumns; i++) {
-    row.push(0);
-  }
   for (let i = 0; i < MaxRows - startLine; i++) {
     blockMap.push(row);
   }
@@ -151,7 +163,7 @@ export type TCurrentBlock = {
   X: number;
   Y: number;
   shapeType: ShapeType;
-  shape: number[][];
+  shape: TShape;
 };
 export const getCurrentBlock = (type: ShapeType): TCurrentBlock => {
   return {
@@ -257,8 +269,8 @@ export const getBottomEdge = (
 };
 
 // find clear lines
-export const getClearLines = (blockMap: TShape): number[] => {
-  const fillFullRows: number[] = [];
+export const getClearLines = (blockMap: TShape): TBlockRow => {
+  const fillFullRows: TBlockRow = [];
   blockMap.forEach((item, index) => {
     const count = item.reduce((p, n) => p + n);
     if (count === MaxColumns) {
@@ -270,10 +282,7 @@ export const getClearLines = (blockMap: TShape): number[] => {
 // create new block patch
 export const getBlockPatch = (length: number): TShape => {
   const patch = [];
-  const blankRow = [];
-  for (let i = 0; i < MaxColumns; i++) {
-    blankRow.push(0);
-  }
+  const blankRow = getBlockRow("Blank");
   while (length) {
     patch.push(blankRow);
     length--;
