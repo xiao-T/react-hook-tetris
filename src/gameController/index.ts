@@ -3,11 +3,11 @@ import { Dispatch } from "react";
 import { TAction, TState } from "../store";
 import {
   MaxRows,
-  TCurrentBlock,
   TShape,
   emptyBlock,
   getBlockRow,
   getBottomEdge,
+  getCurrentBlock,
   getStartBlockMap,
   levels,
 } from "../units";
@@ -60,17 +60,19 @@ const gameController: TGameController = {
   },
   dispatch: () => {},
   start: (dispatch: Dispatch<TAction>, state: TState) => {
-    const { currentBlock, startLine } = state;
+    const { nextShape, startLine } = state;
     gameController.delay = levels[state?.level! - 1];
     const blockMap = getStartBlockMap(startLine);
+    const currentBlock = getCurrentBlock(nextShape!);
     dispatch({
       type: "Start",
       payload: {
         gameStatus: "ing",
         blockMap,
-        bottomEdge: getBottomEdge(blockMap, currentBlock!, {
-          x: currentBlock?.X!,
-          y: currentBlock?.Y!,
+        currentBlock,
+        bottomEdge: getBottomEdge(blockMap, currentBlock, {
+          x: currentBlock.X,
+          y: currentBlock.Y,
         }),
       },
     });
@@ -181,6 +183,7 @@ const gameController: TGameController = {
     gameController.overAnimationTimer = setInterval(() => {
       if (gameController.overAnimationCount < 0) {
         gameController.overReverse(cachedBlockMap);
+        return;
       }
       cachedBlockMap = blockMap.map((item, index) => {
         if (index >= gameController.overAnimationCount) {
@@ -209,6 +212,7 @@ const gameController: TGameController = {
             gameStatus: "unstarted",
           },
         });
+        return;
       }
       gameController.overAnimationCount++;
       const cachedBlockMap = blockMap.map((item, index) => {

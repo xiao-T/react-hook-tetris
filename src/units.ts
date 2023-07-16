@@ -92,74 +92,8 @@ export const rotateBlock = (shape: TShape): TShape => {
   }
   return newShape;
 };
-// calculate safe area for current block
-// export type TRect = {
-//   t: number;
-//   r: number;
-//   b: number;
-//   l: number;
-// };
-// export const calcSafeArea = (
-//   currentBlock: TCurrentBlock,
-//   blockMap: TShape,
-//   safeArea: TRect
-// ): TRect => {
-//   const newSafeArea = {
-//     t: 0,
-//     r: 0,
-//     b: 0,
-//     l: 0,
-//   };
-//   const { shape } = currentBlock;
-//   newSafeArea.r = currentBlock.X + shape[0].length + 1;
-//   // newSafeArea.b = MaxRows - shape.length;
-//   newSafeArea.b = getBottomEdge(currentBlock, blockMap, safeArea);
-//   newSafeArea.l = currentBlock.X;
-//   return newSafeArea;
-// };
-// find the bottom edge based on the current block map and current block
-// it determines where the current block can be placed
-// const getBottomEdge = (
-//   currentBlock: TCurrentBlock,
-//   blockMap: TShape,
-//   safeArea: TRect
-// ): number => {
-//   let bottom = safeArea.b;
-//   const { Y, X, shape } = currentBlock;
-//   const shapeDepth = shape.length;
-//   const shapeWidth = shape[0].length;
-//   const start = Y + shapeDepth;
-//   const flattedShape = shape.flat(Infinity);
-//   // if (start > bottom) {
-//   //   return bottom;
-//   // }
-//   for (let i = start; i < blockMap.length - shapeDepth + 1; i++) {
-//     const shapeShadow = [];
-//     let j = 0;
-//     while (j < shapeDepth) {
-//       shapeShadow.push(blockMap[i + j].slice(X, X + shapeWidth));
-//       j++;
-//     }
-//     // console.log(shapeShadow, shape, "shape-shapeShadow");
-//     const flattedShadow = shapeShadow.flat(Infinity);
-//     // if two array are merged, there is no value more than 1
-//     // then the shadow shape can place current shape
-//     const canBeMerge = flattedShape
-//       .map((item, index) => {
-//         return Number(item) + Number(flattedShadow[index]);
-//       })
-//       .every((item) => item <= 1);
-//     // console.log(flattedShadow, canBeMerge, "----", flattedShape);
-//     if (canBeMerge) {
-//       bottom = i;
-//     } else {
-//       break;
-//     }
-//   }
-//   return bottom;
-// };
-// generate current block based on next block
 
+// generate current block based on next block
 export const emptyBlock: TCurrentBlock = {
   X: 0,
   Y: 0,

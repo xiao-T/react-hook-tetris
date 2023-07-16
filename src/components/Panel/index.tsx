@@ -7,7 +7,7 @@ import audioPlayer from "../../audio";
 
 const Panel = () => {
   const { dispatch, ...rest } = useContext(GameContext);
-  const { pause, mute, gameStatus } = rest;
+  const { pause, mute, gameStatus, blockMap } = rest;
   return (
     <div className="mx-8 flex">
       <div className="flex-1">
@@ -45,7 +45,22 @@ const Panel = () => {
               });
             }}
           />
-          <Button label="重玩" size="sm" bg="red" onClick={(e) => {}} />
+          <Button
+            label="重玩"
+            size="sm"
+            bg="red"
+            onClick={() => {
+              if (gameStatus === "done") {
+                return;
+              }
+              gameController.clear();
+              if (gameStatus === "ing") {
+                gameController.over(blockMap!);
+              } else if (gameStatus === "unstarted") {
+                gameController.start(dispatch, rest);
+              }
+            }}
+          />
         </div>
         <div className="mt-16">
           <Button

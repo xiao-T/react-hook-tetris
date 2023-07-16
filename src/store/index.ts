@@ -35,8 +35,6 @@ export type TState = {
   currentBlock?: TCurrentBlock;
   bottomEdge?: number;
 };
-const defaultCurrentBlockType = getNextBlockShape();
-const defaultCurrentBlock = getCurrentBlock(defaultCurrentBlockType);
 const defaultBlockMap = getStartBlockMap();
 export const initState: TState = {
   lockStatus: "unlock",
@@ -53,12 +51,9 @@ export const initState: TState = {
   helper: !false,
   flash: false,
   blockMap: defaultBlockMap,
-  currentBlock: defaultCurrentBlock,
+  currentBlock: emptyBlock,
   // need to be updated based on the current block and block map
-  bottomEdge: getBottomEdge(defaultBlockMap, defaultCurrentBlock, {
-    x: defaultCurrentBlock.X,
-    y: defaultCurrentBlock.Y,
-  }),
+  bottomEdge: 0,
 };
 
 type TLevel = "AddLevel" | "ReduceLevel";
