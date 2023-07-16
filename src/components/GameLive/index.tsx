@@ -2,7 +2,11 @@
 import React, { FC, useContext } from "react";
 import Block from "../Block";
 import GameContext from "../../store";
-import { isShouldBeLock, mergeCurrentBlockIntoBlockMap } from "../../units";
+import {
+  isShouldBeLock,
+  letterBlockShape,
+  mergeCurrentBlockIntoBlockMap,
+} from "../../units";
 
 const GameLive: FC = () => {
   const {
@@ -13,8 +17,20 @@ const GameLive: FC = () => {
     bottomEdge,
     flash,
     clearLines,
+    gameStatus,
   } = useContext(GameContext);
-  const liveBlockMap = mergeCurrentBlockIntoBlockMap(currentBlock!, blockMap!);
+  let liveBlockMap = mergeCurrentBlockIntoBlockMap(currentBlock!, blockMap!);
+  if (gameStatus === "unstarted") {
+    liveBlockMap = mergeCurrentBlockIntoBlockMap(
+      {
+        X: 0,
+        Y: 0,
+        shape: letterBlockShape,
+        shapeType: "I",
+      },
+      blockMap!
+    );
+  }
   return (
     <div className="border border-black pb-[0.1rem] pl-[0.2rem] pr-[0.1rem] pt-[0.2rem]">
       {liveBlockMap?.map((row, index) => {

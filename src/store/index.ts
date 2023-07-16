@@ -13,6 +13,7 @@ import {
   MinStartLine,
   ShapeType,
   TCurrentBlock,
+  TShape,
 } from "../units";
 import level from "./level";
 import startLine from "./startLine";
@@ -31,7 +32,7 @@ export type TState = {
   score?: number;
   helper?: boolean;
   flash?: boolean;
-  blockMap?: number[][];
+  blockMap?: TShape;
   currentBlock?: TCurrentBlock;
   bottomEdge?: number;
 };
