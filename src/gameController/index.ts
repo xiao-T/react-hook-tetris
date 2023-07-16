@@ -1,15 +1,27 @@
 // game controller
 import { Dispatch } from "react";
 import { TAction, TState } from "../store";
-import { getBottomEdge, getStartBlockMap, levels } from "../units";
+import {
+  MaxRows,
+  TCurrentBlock,
+  TShape,
+  emptyBlock,
+  getBlockRow,
+  getBottomEdge,
+  getStartBlockMap,
+  levels,
+} from "../units";
+import audioPlayer from "../audio";
 
-type TClear = "Lock" | "Auto" | "Flash";
+type TClear = "Lock" | "Auto" | "Flash" | "Over";
 type TGameController = {
   flashTimer: ReturnType<typeof setTimeout> | null;
   unlockTimer: ReturnType<typeof setTimeout> | null;
   autoDownInterval: ReturnType<typeof setTimeout> | null;
+  overAnimationTimer: ReturnType<typeof setTimeout> | null;
   delay: number;
   flashCount: number;
+  overAnimationCount: number;
   clear: (type?: TClear) => void;
   start: (dispatch: Dispatch<TAction>, state: TState) => void;
   auto: (dispatch: Dispatch<TAction>) => void;
@@ -17,8 +29,10 @@ type TGameController = {
   right: (dispatch: Dispatch<TAction>) => void;
   down: (dispatch: Dispatch<TAction>) => void;
   next: () => void;
-  lock: () => void;
+  lock: (over: boolean, blockMap: TShape) => void;
   flash: () => void;
+  over: (blockMap: TShape) => void;
+  overReverse: (blockMap: TShape) => void;
   fall: (dispatch: Dispatch<TAction>) => void;
   dispatch: Dispatch<TAction>;
 };
@@ -26,18 +40,22 @@ const gameController: TGameController = {
   flashTimer: null,
   autoDownInterval: null,
   unlockTimer: null,
+  overAnimationTimer: null,
   delay: 0,
   flashCount: 0,
+  overAnimationCount: MaxRows - 1,
   clear: (type?: TClear) => {
     if (type === "Auto" || !type) {
-      gameController.autoDownInterval &&
-        clearTimeout(gameController.autoDownInterval);
+      clearTimeout(gameController.autoDownInterval!);
     }
     if (type === "Lock" || !type) {
-      gameController.unlockTimer && clearTimeout(gameController.unlockTimer);
+      clearTimeout(gameController.unlockTimer!);
     }
     if (type === "Flash" || !type) {
-      gameController.flashTimer && clearInterval(gameController.flashTimer);
+      clearInterval(gameController.flashTimer!);
+    }
+    if (type === "Over" || !type) {
+      clearInterval(gameController.overAnimationTimer!);
     }
   },
   dispatch: () => {},
@@ -103,7 +121,7 @@ const gameController: TGameController = {
     });
     gameController.auto(gameController.dispatch);
   },
-  lock: () => {
+  lock: (over: boolean, blockMap: TShape) => {
     gameController.clear();
     // lock current block
     gameController.dispatch({
@@ -120,7 +138,12 @@ const gameController: TGameController = {
           lockStatus: "unlock",
         },
       });
-      gameController.next();
+      if (over) {
+        audioPlayer.gameOver?.();
+        gameController.over(blockMap);
+      } else {
+        gameController.next();
+      }
     }, 200);
   },
   flash: () => {
@@ -150,6 +173,59 @@ const gameController: TGameController = {
       });
       gameController.flash();
     }, 100);
+  },
+  over: (blockMap: TShape) => {
+    gameController.clear("Over");
+    let cachedBlockMap: TShape = [];
+    gameController.overAnimationCount = MaxRows - 1;
+    gameController.overAnimationTimer = setInterval(() => {
+      if (gameController.overAnimationCount < 0) {
+        gameController.overReverse(cachedBlockMap);
+      }
+      cachedBlockMap = blockMap.map((item, index) => {
+        if (index >= gameController.overAnimationCount) {
+          return getBlockRow("Fill");
+        }
+        return [...item];
+      });
+      gameController.overAnimationCount--;
+      gameController.dispatch({
+        type: "Over",
+        payload: {
+          gameStatus: "done",
+          blockMap: cachedBlockMap,
+        },
+      });
+    }, 60);
+  },
+  overReverse: (blockMap: TShape) => {
+    gameController.clear("Over");
+    gameController.overAnimationTimer = setInterval(() => {
+      if (gameController.overAnimationCount > MaxRows) {
+        gameController.clear("Over");
+        gameController.dispatch({
+          type: "Reset",
+          payload: {
+            gameStatus: "unstarted",
+          },
+        });
+      }
+      gameController.overAnimationCount++;
+      const cachedBlockMap = blockMap.map((item, index) => {
+        if (index <= gameController.overAnimationCount) {
+          return getBlockRow("Blank");
+        }
+        return [...item];
+      });
+      gameController.dispatch({
+        type: "Over",
+        payload: {
+          gameStatus: "done",
+          blockMap: cachedBlockMap,
+          currentBlock: emptyBlock,
+        },
+      });
+    }, 60);
   },
 };
 export default gameController;

@@ -8,6 +8,7 @@ import {
   canBePlaced,
   getBottomEdge,
   getClearLines,
+  isGameOver,
   mergeCurrentBlockIntoBlockMap,
   rotateBlock,
 } from "../units";
@@ -85,10 +86,11 @@ const move = {
         currentBlock,
         blockMap!
       );
+      const newBlock = { ...currentBlock, Y };
       const clearLines = getClearLines(newBlockMap);
       if (clearLines.length) {
         // if there are full fill lines
-        // need to clear it
+        // need to clear they
         audioPlayer.clear?.();
         gameController.flash();
       } else {
@@ -96,11 +98,12 @@ const move = {
         // clear game controller timer
         // and create new current block based on next block,
         // then generate new next block
-        gameController.lock();
+        gameController.lock(isGameOver(newBlockMap, newBlock), newBlockMap);
       }
       return {
         ...state,
         clearLines,
+        currentBlock: newBlock,
         blockMap: newBlockMap,
       };
     }
@@ -130,6 +133,7 @@ const move = {
       }),
     };
   },
+  // TODO
   fall: (state: TState): TState => {
     const { currentBlock = {} as TCurrentBlock, bottomEdge, blockMap } = state;
     let { Y } = currentBlock;
@@ -143,7 +147,7 @@ const move = {
       audioPlayer.clear?.();
       gameController.flash();
     } else {
-      gameController.lock();
+      gameController.lock(isGameOver(newBlockMap, newBlock), newBlockMap);
     }
     return {
       ...state,

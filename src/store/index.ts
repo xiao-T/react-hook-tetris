@@ -3,6 +3,7 @@
 import { createContext, Dispatch } from "react";
 import {
   clearPoints,
+  emptyBlock,
   getBlockPatch,
   getBottomEdge,
   getCurrentBlock,
@@ -72,6 +73,8 @@ export type TAction = {
     | "Lock"
     | "Flash"
     | "Clear"
+    | "Over"
+    | "Reset"
     | TBlockAction
     | TLevel
     | TStartLine;
@@ -93,7 +96,9 @@ export const reducer = (state = initState, action: TAction) => {
     case "Pause":
     case "Mute":
     case "Flash":
-    case "Lock": {
+    case "Lock":
+    case "Reset":
+    case "Over": {
       return newState;
     }
     case "Clear": {
@@ -106,12 +111,6 @@ export const reducer = (state = initState, action: TAction) => {
       );
       const len = clearLines?.length;
       const blockMapPatch = getBlockPatch(len!);
-      const emptyBlock: TCurrentBlock = {
-        X: 0,
-        Y: 0,
-        shape: [[]],
-        shapeType: "T",
-      };
       return {
         ...newState,
         blockMap: blockMapPatch.concat(newBlockMap!),

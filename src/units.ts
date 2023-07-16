@@ -32,7 +32,7 @@ export type ShapeType = keyof typeof blockShape;
 // create block row
 type TBlockRow = number[];
 type TBlockType = "Blank" | "Fill";
-const getBlockRow = (type: TBlockType): TBlockRow => {
+export const getBlockRow = (type: TBlockType): TBlockRow => {
   const blankRow = [];
   for (let i = 0; i < MaxColumns; i++) {
     if (type === "Blank") {
@@ -77,7 +77,7 @@ export const MinLevel = 1;
 export const MaxStartLine = 10;
 export const MinStartLine = 0;
 // rotate block
-type TShape = number[][];
+export type TShape = number[][];
 export const rotateBlock = (shape: TShape): TShape => {
   const rows = shape.length;
   const columns = shape[0].length;
@@ -159,6 +159,13 @@ export const rotateBlock = (shape: TShape): TShape => {
 //   return bottom;
 // };
 // generate current block based on next block
+
+export const emptyBlock: TCurrentBlock = {
+  X: 0,
+  Y: 0,
+  shape: [[]],
+  shapeType: "T",
+};
 export type TCurrentBlock = {
   X: number;
   Y: number;
@@ -251,7 +258,7 @@ export const getBottomEdge = (
   block: TCurrentBlock,
   position: TPosition
 ): number => {
-  let bottomEdge = MaxRows;
+  let bottomEdge = 0;
   const { x, y } = position;
   for (let i = y; i <= MaxRows - block.shape.length; i++) {
     const result = canBePlaced(blockMap, block, {
@@ -280,12 +287,25 @@ export const getClearLines = (blockMap: TShape): TBlockRow => {
   return fillFullRows;
 };
 // create new block patch
-export const getBlockPatch = (length: number): TShape => {
+export const getBlockPatch = (
+  length: number,
+  blockType: TBlockType = "Blank"
+): TShape => {
   const patch = [];
-  const blankRow = getBlockRow("Blank");
+  const blankRow = getBlockRow(blockType);
   while (length) {
     patch.push(blankRow);
     length--;
   }
   return patch;
+};
+// check if the game is over
+export const isGameOver = (
+  blockMap: TShape,
+  currentBlock: TCurrentBlock
+): boolean => {
+  const { X, shape } = currentBlock;
+  const shapeWidth = shape[0].length;
+  const topShadowShape = blockMap[0].slice(X, X + shapeWidth);
+  return topShadowShape.reduce((p, n) => p + n) > 0;
 };

@@ -52,6 +52,9 @@ const Panel = () => {
             label="掉落"
             size="lg"
             onClick={() => {
+              if (gameStatus === "done") {
+                return;
+              }
               if (gameStatus === "ing") {
                 if (!mute) {
                   audioPlayer.fall?.();
