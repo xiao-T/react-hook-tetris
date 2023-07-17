@@ -70,9 +70,12 @@ const move = {
       }),
     };
   },
-  down: (state: TState): TState => {
+  down: (state: TState, type?: "fall"): TState => {
     const { currentBlock = {} as TCurrentBlock, blockMap, bottomEdge } = state;
     let { Y, X } = currentBlock;
+    if (type === "fall") {
+      Y = bottomEdge!;
+    }
     if (!isNaN(Y) && bottomEdge! > Y) {
       const shouldUpdate = canBePlaced(blockMap!, currentBlock, {
         x: X,
@@ -82,11 +85,8 @@ const move = {
         Y = Y + 1;
       }
     } else {
-      const newBlockMap = mergeCurrentBlockIntoBlockMap(
-        currentBlock,
-        blockMap!
-      );
       const newBlock = { ...currentBlock, Y };
+      const newBlockMap = mergeCurrentBlockIntoBlockMap(newBlock, blockMap!);
       const clearLines = getClearLines(newBlockMap);
       if (clearLines.length) {
         // if there are full fill lines
@@ -135,26 +135,7 @@ const move = {
   },
   // TODO
   fall: (state: TState): TState => {
-    const { currentBlock = {} as TCurrentBlock, bottomEdge, blockMap } = state;
-    let { Y } = currentBlock;
-    if (!isNaN(Y)) {
-      Y = bottomEdge!;
-    }
-    const newBlock = { ...currentBlock, Y };
-    const newBlockMap = mergeCurrentBlockIntoBlockMap(newBlock, blockMap!);
-    const clearLines = getClearLines(newBlockMap);
-    if (clearLines.length) {
-      audioPlayer.clear?.();
-      gameController.flash();
-    } else {
-      gameController.lock(isGameOver(newBlockMap, newBlock), newBlockMap);
-    }
-    return {
-      ...state,
-      clearLines,
-      blockMap: newBlockMap,
-      currentBlock: newBlock,
-    };
+    return move.down(state, "fall");
   },
 };
 
